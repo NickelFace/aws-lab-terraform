@@ -1,0 +1,3 @@
+aws_region = "eu-central-1"
+project    = "aws-lab"
+vpc_cidr   = "10.20.0.0/16"
