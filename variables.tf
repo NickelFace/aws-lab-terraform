@@ -15,3 +15,21 @@ variable "vpc_cidr" {
   type        = string
   default     = "10.20.0.0/16"
 }
+
+variable "instance_type" {
+  description = "EC2 instance type for the lab web host"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "allowed_ssh_cidr" {
+  description = "CIDR allowed to reach the instance over SSH"
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
+variable "key_name" {
+  description = "Optional name of an existing EC2 key pair for SSH access"
+  type        = string
+  default     = null
+}

@@ -2,11 +2,10 @@
 
 ![Terraform](https://img.shields.io/badge/Terraform-1.5+-7B42BC?logo=terraform&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-VPC%20·%20EC2%20·%20S3%20·%20IAM-232F3E?logo=amazonaws&logoColor=white)
-![Status](https://img.shields.io/badge/status-scaffold%20(WIP)-yellow)
 
 Infrastructure-as-Code for a small AWS lab environment, provisioned with Terraform. Built as hands-on preparation for the **AWS Solutions Architect Associate** exam — the goal is that every lab I study ends up reproducible in code, not clicked together in the console.
 
-> **Status: scaffold.** Module structure, provider pinning, and variables are in place. The resource definitions inside each module are stubbed with `TODO`s and will be filled in incrementally.
+A single `terraform apply` brings up a VPC with public/private subnets, an EC2 web host bootstrapped with nginx, a versioned and encrypted S3 bucket, and a least-privilege IAM role that lets the instance reach **only** that bucket.
 
 ## Planned architecture
 
@@ -20,21 +19,25 @@ Infrastructure-as-Code for a small AWS lab environment, provisioned with Terrafo
                  └───────────────────────────────────────────────────────────────────────────┘
 ```
 
-| Module | Will provision |
+| Module | Provisions |
 |---|---|
-| [`modules/vpc`](modules/vpc) | VPC, public/private subnets, internet gateway, route tables |
-| [`modules/ec2`](modules/ec2) | EC2 instance, security group, key pair, bootstrap user_data |
-| [`modules/s3`](modules/s3) | S3 bucket with versioning, encryption, public-access block |
-| [`modules/iam`](modules/iam) | IAM role + instance profile granting EC2 scoped S3 access |
+| [`modules/vpc`](modules/vpc) | VPC, public/private subnets, internet gateway, route table |
+| [`modules/ec2`](modules/ec2) | EC2 instance (AL2023 + nginx), security group, bootstrap user_data |
+| [`modules/s3`](modules/s3) | S3 bucket with versioning, AES256 encryption, public-access block |
+| [`modules/iam`](modules/iam) | IAM role + instance profile granting EC2 scoped access to the bucket only |
 
-## Usage (once implemented)
+## Usage
 
 ```bash
-cp terraform.tfvars.example terraform.tfvars   # adjust region / project
+cp terraform.tfvars.example terraform.tfvars   # set region, project, your SSH CIDR
 terraform init
 terraform plan
 terraform apply
 ```
+
+After apply, `terraform output instance_public_ip` gives you the nginx host. Tear it all down with `terraform destroy`.
+
+> Note: `allowed_ssh_cidr` defaults to `0.0.0.0/0` for convenience — restrict it to your own `/32` in `terraform.tfvars` before any real use.
 
 ## Layout
 
