@@ -29,7 +29,12 @@ A single `terraform apply` brings up a VPC with public/private subnets, an EC2 w
 ## Usage
 
 ```bash
-cp terraform.tfvars.example terraform.tfvars   # set region, project, your SSH CIDR
+cp terraform.tfvars.example terraform.tfvars   # set region, project, your SSH CIDR /32
+
+# Optional: configure remote state (S3 backend + DynamoDB lock)
+cp backend.tf.example backend.tf              # fill in your bucket/table names
+# backend.tf is gitignored — never commit it
+
 terraform init
 terraform plan
 terraform apply
@@ -37,7 +42,7 @@ terraform apply
 
 After apply, `terraform output instance_public_ip` gives you the nginx host. Tear it all down with `terraform destroy`.
 
-> Note: `allowed_ssh_cidr` defaults to `0.0.0.0/0` for convenience — restrict it to your own `/32` in `terraform.tfvars` before any real use.
+> `allowed_ssh_cidr` has no default — you must supply your own `/32` in `terraform.tfvars` (see `terraform.tfvars.example`).
 
 ## Layout
 

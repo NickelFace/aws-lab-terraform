@@ -23,9 +23,8 @@ variable "instance_type" {
 }
 
 variable "allowed_ssh_cidr" {
-  description = "CIDR allowed to reach the instance over SSH"
+  description = "CIDR allowed to reach the instance over SSH — set to your IP (e.g. 203.0.113.1/32)"
   type        = string
-  default     = "0.0.0.0/0"
 }
 
 variable "key_name" {
