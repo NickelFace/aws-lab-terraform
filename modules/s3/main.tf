@@ -4,12 +4,28 @@ resource "random_id" "suffix" {
 
 # ---------- KMS key for bucket encryption (CKV_AWS_145) ----------
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_kms_key" "s3" {
   description             = "KMS key for ${var.project} S3 bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.kms_s3.json
 
   tags = { Name = "${var.project}-s3-kms" }
+}
+
+data "aws_iam_policy_document" "kms_s3" {
+  statement {
+    sid       = "EnableRootAccountFullAccess"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
 }
 
 resource "aws_kms_alias" "s3" {
@@ -101,6 +117,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     id     = "expire-old-logs"
     status = "Enabled"
 
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
     expiration {
       days = 90
     }
@@ -122,6 +142,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     id     = "transition-and-expire"
     status = "Enabled"
 
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
     transition {
       days          = 90
       storage_class = "STANDARD_IA"
@@ -134,8 +158,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 # ---------- Event notifications via SNS (CKV2_AWS_62) ----------
-
-data "aws_caller_identity" "current" {}
 
 resource "aws_sns_topic" "s3_events" {
   name              = "${var.project}-s3-events"
@@ -192,8 +214,22 @@ resource "aws_kms_key" "replica" {
   description             = "KMS key for ${var.project} S3 replica bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.kms_replica.json
 
   tags = { Name = "${var.project}-s3-replica-kms" }
+}
+
+data "aws_iam_policy_document" "kms_replica" {
+  statement {
+    sid       = "EnableRootAccountFullAccess"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
 }
 
 resource "aws_s3_bucket" "replica" {
@@ -245,6 +281,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "replica" {
   rule {
     id     = "expire-noncurrent"
     status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
 
     noncurrent_version_expiration {
       noncurrent_days = 30
