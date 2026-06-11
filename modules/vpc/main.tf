@@ -54,3 +54,59 @@ resource "aws_default_security_group" "default" {
 
   tags = { Name = "${var.project}-default-sg-locked" }
 }
+
+# ---------- VPC flow logs → CloudWatch ----------
+
+resource "aws_flow_log" "this" {
+  vpc_id                   = aws_vpc.this.id
+  traffic_type             = "ALL"
+  log_destination_type     = "cloud-watch-logs"
+  log_destination          = aws_cloudwatch_log_group.flow_log.arn
+  iam_role_arn             = aws_iam_role.flow_log.arn
+  max_aggregation_interval = 60
+
+  tags = { Name = "${var.project}-vpc-flow-log" }
+}
+
+resource "aws_cloudwatch_log_group" "flow_log" {
+  name              = "/aws/vpc/${var.project}-flow-logs"
+  retention_in_days = 30
+
+  tags = { Name = "${var.project}-flow-log-group" }
+}
+
+data "aws_iam_policy_document" "flow_log_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["vpc-flow-logs.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "flow_log" {
+  name               = "${var.project}-vpc-flow-log-role"
+  assume_role_policy = data.aws_iam_policy_document.flow_log_assume.json
+
+  tags = { Name = "${var.project}-flow-log-role" }
+}
+
+data "aws_iam_policy_document" "flow_log_publish" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "flow_log" {
+  name   = "${var.project}-vpc-flow-log-publish"
+  role   = aws_iam_role.flow_log.id
+  policy = data.aws_iam_policy_document.flow_log_publish.json
+}

@@ -9,6 +9,11 @@ module "vpc" {
 module "s3" {
   source  = "./modules/s3"
   project = var.project
+
+  providers = {
+    aws         = aws
+    aws.replica = aws.replica
+  }
 }
 
 module "iam" {
@@ -26,4 +31,5 @@ module "ec2" {
   instance_profile_name = module.iam.instance_profile_name
   key_name              = var.key_name
   allowed_ssh_cidr      = var.allowed_ssh_cidr
+  allowed_http_cidr     = var.allowed_http_cidr
 }

@@ -27,6 +27,17 @@ variable "allowed_ssh_cidr" {
   type        = string
 }
 
+variable "allowed_http_cidr" {
+  description = "CIDR allowed to reach the instance over HTTP — set to your IP or LB CIDR"
+  type        = string
+}
+
+variable "replica_region" {
+  description = "AWS region for S3 cross-region replication"
+  type        = string
+  default     = "eu-west-1"
+}
+
 variable "key_name" {
   description = "Optional name of an existing EC2 key pair for SSH access"
   type        = string

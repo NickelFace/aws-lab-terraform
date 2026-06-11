@@ -36,7 +36,6 @@ variable "allowed_ssh_cidr" {
 }
 
 variable "allowed_http_cidr" {
-  description = "CIDR allowed to reach the instance over HTTP — default your /32 or a load balancer CIDR"
+  description = "CIDR allowed to reach the instance over HTTP — set to your IP or LB CIDR"
   type        = string
-  default     = "0.0.0.0/0"
 }

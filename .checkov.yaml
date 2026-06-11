@@ -1,18 +1,3 @@
 skip-check:
-  # Lab web server is intentionally publicly accessible over HTTP
-  - CKV_AWS_260
-  # Single-region lab does not require cross-region S3 replication
-  - CKV_AWS_144
-  # S3 access logging requires a dedicated log bucket — out of scope for a single-bucket lab
-  - CKV_AWS_18
-  # Lab uses AES256 SSE (already enabled); CMK (KMS) adds operational overhead not justified here
-  - CKV_AWS_145
-  # VPC flow logs require a log destination — out of scope for a lab (CKV_AWS_73 = v1, CKV2_AWS_11 = v2)
-  - CKV_AWS_73
-  - CKV2_AWS_11
   # NACL default rules are lab-acceptable; fine-grained NACL tuning is out of scope
   - CKV_AWS_352
-  # S3 lifecycle policy not warranted for a short-lived lab bucket
-  - CKV2_AWS_61
-  # S3 event notifications are not needed for a static lab bucket
-  - CKV2_AWS_62

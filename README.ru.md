@@ -23,9 +23,9 @@
 
 | Модуль | Создаёт |
 |---|---|
-| [`modules/vpc`](modules/vpc) | VPC, публичная/приватная подсеть, internet gateway, таблица маршрутов |
+| [`modules/vpc`](modules/vpc) | VPC, публичная/приватная подсеть, internet gateway, таблица маршрутов, flow logs, блокировка default SG |
 | [`modules/ec2`](modules/ec2) | EC2 инстанс (AL2023 + nginx), security group, bootstrap user_data |
-| [`modules/s3`](modules/s3) | S3 бакет с версионированием, AES256-шифрованием, блокировкой публичного доступа |
+| [`modules/s3`](modules/s3) | S3 бакет с версионированием, KMS-шифрованием, access logging, lifecycle, SNS-уведомлениями, cross-region replication |
 | [`modules/iam`](modules/iam) | IAM роль + instance profile с доступом только к нужному бакету |
 
 ## Использование
@@ -39,7 +39,7 @@ terraform apply
 
 После применения `terraform output instance_public_ip` покажет адрес nginx-хоста. Удалить всё: `terraform destroy`.
 
-> Замечание: `allowed_ssh_cidr` по умолчанию `0.0.0.0/0` для удобства — ограничь до своего `/32` в `terraform.tfvars` перед реальным использованием.
+> `allowed_ssh_cidr` и `allowed_http_cidr` не имеют значений по умолчанию — укажи свой `/32` в `terraform.tfvars` (см. `terraform.tfvars.example`).
 
 ## Структура
 

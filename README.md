@@ -22,9 +22,9 @@ A single `terraform apply` brings up a VPC with public/private subnets, an EC2 w
 
 | Module | Provisions |
 |---|---|
-| [`modules/vpc`](modules/vpc) | VPC, public/private subnets, internet gateway, route table |
+| [`modules/vpc`](modules/vpc) | VPC, public/private subnets, internet gateway, route table, flow logs, default SG lockdown |
 | [`modules/ec2`](modules/ec2) | EC2 instance (AL2023 + nginx), security group, bootstrap user_data |
-| [`modules/s3`](modules/s3) | S3 bucket with versioning, AES256 encryption, public-access block |
+| [`modules/s3`](modules/s3) | S3 bucket with versioning, KMS encryption, access logging, lifecycle, SNS notifications, cross-region replication |
 | [`modules/iam`](modules/iam) | IAM role + instance profile granting EC2 scoped access to the bucket only |
 
 ## Usage
@@ -43,7 +43,7 @@ terraform apply
 
 After apply, `terraform output instance_public_ip` gives you the nginx host. Tear it all down with `terraform destroy`.
 
-> `allowed_ssh_cidr` has no default — you must supply your own `/32` in `terraform.tfvars` (see `terraform.tfvars.example`).
+> `allowed_ssh_cidr` and `allowed_http_cidr` have no defaults — you must supply your own `/32` in `terraform.tfvars` (see `terraform.tfvars.example`).
 
 ## Layout
 
