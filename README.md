@@ -1,5 +1,6 @@
 # aws-lab-terraform
 
+[![CI](https://github.com/NickelFace/aws-lab-terraform/actions/workflows/ci.yml/badge.svg)](https://github.com/NickelFace/aws-lab-terraform/actions/workflows/ci.yml)
 ![Terraform](https://img.shields.io/badge/Terraform-1.5+-7B42BC?logo=terraform&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-VPC%20·%20EC2%20·%20S3%20·%20IAM-232F3E?logo=amazonaws&logoColor=white)
 
