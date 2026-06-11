@@ -31,14 +31,22 @@ resource "aws_security_group" "this" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
+    cidr_blocks = [var.allowed_http_cidr]
+  }
+
+  egress {
+    description = "HTTPS outbound (package updates, AWS APIs)"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "HTTP outbound (package mirrors)"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -52,6 +60,16 @@ resource "aws_instance" "this" {
   vpc_security_group_ids = [aws_security_group.this.id]
   iam_instance_profile   = var.instance_profile_name
   key_name               = var.key_name
+  ebs_optimized          = true
+  monitoring             = true
+
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  root_block_device {
+    encrypted = true
+  }
 
   user_data = <<-EOF
     #!/bin/bash

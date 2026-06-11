@@ -31,7 +31,12 @@ variable "key_name" {
 }
 
 variable "allowed_ssh_cidr" {
-  description = "CIDR allowed to reach the instance over SSH"
+  description = "CIDR allowed to reach the instance over SSH — use your /32"
+  type        = string
+}
+
+variable "allowed_http_cidr" {
+  description = "CIDR allowed to reach the instance over HTTP — default your /32 or a load balancer CIDR"
   type        = string
   default     = "0.0.0.0/0"
 }
